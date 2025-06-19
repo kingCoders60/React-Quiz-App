@@ -1,16 +1,18 @@
 import React from 'react'
-import {useState} from 'react'
+import {useState,useCallback} from 'react'
 import Questions from '../questions.js'
 import CompletedImg from '../assets/quiz-complete.png';
+import QuestionTimer from "./QuestionTimer.jsx"
 const Quiz = () => {
     const [userAnswers,setUserAnswers ] = useState([]);
     const activeQuestionIndex = userAnswers.length;
-    const handleSelect=(answers)=>{
+    const handleSelectAnswer=(answers)=>{
         setUserAnswers((prev)=>{
             return [...prev, answers];
         });
     }
     const isquizCompleted = activeQuestionIndex === Questions.length;
+    const handleSkipAnswer=useCallback(()=>handleSelectAnswer(null),[])
     if (isquizCompleted) {
       return (
         <div id="summary">
@@ -24,17 +26,24 @@ const Quiz = () => {
     
     
   return (
-    <div id="questions">
-      <h2>{Questions[activeQuestionIndex]?.text || "No more Questions"}</h2>
-      <ul id="answers">
-        {suffledAnswer.map((answers)=>(
+    <div id="quiz">
+      <div id="questions">
+        <QuestionTimer timeout={10000} onTimeout={() => handleSelectAnswer(null)} />
+        <h2>{Questions[activeQuestionIndex]?.text || "No more Questions"}</h2>
+
+        <ul id="answers">
+          {suffledAnswer.map((answers) => (
             <li key={answers} className="answer">
-                <button onClick={()=>{
-                    handleSelect(answers)
-                }}>{answers}</button>
+              <button
+                onClick={() => {
+                  handleSelectAnswer(answers);
+                }}>
+                {answers}
+              </button>
             </li>
-        ))}
-      </ul>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
